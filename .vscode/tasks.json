@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Delete old Git branches",
+            "type": "shell",
+            "linux": {
+                "command": "git fetch --prune && git fetch -p ; git branch -r | awk '{print $1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -D"
+            },
+            "windows": {
+                "command": "git fetch --prune; git branch -vv | ?{$_ -match 'origin/' -and -not (git branch -r | %{\"$_\"})} | %{$_.Split()[0]} | % { git branch -D $_ }"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "close": true
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}
