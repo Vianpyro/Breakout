@@ -1,0 +1,86 @@
+name: Create Release on PR Merge
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Cargo.toml" # Trigger only on version changes since a workflow verifies version bumps on Rust changes
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Game Binaries
+    uses: ./.github/workflows/build-game-binary.yml
+    secrets: inherit
+
+  create_release:
+    name: Create Release and Upload Assets
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download build artifacts (Linux)
+        uses: actions/download-artifact@v4
+        with:
+          name: Pong-ubuntu-latest
+          path: dist/Pong-ubuntu-latest
+
+      - name: Download build artifacts (Windows)
+        uses: actions/download-artifact@v4
+        with:
+          name: Pong-windows-latest
+          path: dist/Pong-windows-latest
+
+      - name: Download build artifacts (macOS)
+        uses: actions/download-artifact@v4
+        with:
+          name: Pong-macos-latest
+          path: dist/Pong-macos-latest
+
+      - name: Rename and flatten binaries
+        run: |
+          # Linux
+          if [[ -f dist/Pong-ubuntu-latest/rust-pong ]]; then
+            cp dist/Pong-ubuntu-latest/rust-pong dist/rust-pong-linux
+          elif [[ -f dist/Pong-ubuntu-latest/Rust-Pong ]]; then
+            cp dist/Pong-ubuntu-latest/Rust-Pong dist/rust-pong-linux
+          fi
+          # macOS
+          if [[ -f dist/Pong-macos-latest/rust-pong ]]; then
+            cp dist/Pong-macos-latest/rust-pong dist/rust-pong-macos
+          elif [[ -f dist/Pong-macos-latest/Rust-Pong ]]; then
+            cp dist/Pong-macos-latest/Rust-Pong dist/rust-pong-macos
+          fi
+          # Windows
+          if [[ -f dist/Pong-windows-latest/rust-pong.exe ]]; then
+            cp dist/Pong-windows-latest/rust-pong.exe dist/rust-pong-windows.exe
+          elif [[ -f dist/Pong-windows-latest/Rust-Pong.exe ]]; then
+            cp dist/Pong-windows-latest/Rust-Pong.exe dist/rust-pong-windows.exe
+          fi
+
+      - name: Retrieve version from Cargo.toml
+        id: get_version
+        run: |
+          VERSION=$(grep '^version =' Cargo.toml | head -n 1 | cut -d '"' -f 2)
+          echo "version=$VERSION" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release and upload assets
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: "Version ${{ steps.get_version.outputs.version }}"
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: false
+          files: |
+            dist/rust-pong-linux
+            dist/rust-pong-macos
+            dist/rust-pong-windows.exe
