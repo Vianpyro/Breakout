@@ -1,9 +1,17 @@
+#![windows_subsystem = "windows"]
+
+mod player;
+mod viewport;
 use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy::window::WindowMode;
+use viewport::{VirtualResolution, WindowViewport};
 
 fn main() {
     App::new()
+        .insert_resource(VirtualResolution { width: 1280.0, height: 720.0 })
+        .insert_resource(viewport::ScalingStrategy::AutoMin)
+        .insert_resource(WindowViewport::default())
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 mode: WindowMode::BorderlessFullscreen(MonitorSelection::Current),
@@ -11,8 +19,18 @@ fn main() {
             }),
             ..default()
         }))
+        .add_systems(
+            Startup,
+            (
+                spawn_camera,
+                spawn_map,
+                viewport::set_initial_window_viewport,
+                viewport::update_camera_on_resize,
+            ),
+        )
         .add_systems(PreUpdate, exit_on_esc_system)
-        .add_systems(Startup, (spawn_camera, spawn_map))
+        .add_systems(Update, (viewport::maybe_update_window_viewport, viewport::update_camera_on_resize))
+        .add_systems(Update, player::paddle::paddle_movement_system)
         .run();
 }
 
@@ -27,16 +45,6 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn(DirectionalLight::default());
 }
 
-fn spawn_map(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>) {
-    let count = 16;
-    let ball_mesh = meshes.add(Circle::new(20.0));
-    for i in 0..count {
-        let color = Color::hsl((i as f32 / count as f32) * 360.0, 1.0, 0.5);
-        let ball_material = materials.add(ColorMaterial::from(color));
-        commands.spawn((
-            Mesh2d(ball_mesh.clone()),
-            MeshMaterial2d(ball_material),
-            Transform::from_translation(Vec3::new((-8.0 + i as f32) * 40.0, 0.0, 0.0)),
-        ));
-    }
+fn spawn_map(mut _commands: Commands, mut _meshes: ResMut<Assets<Mesh>>, mut _materials: ResMut<Assets<ColorMaterial>>) {
+    player::paddle::create_paddle(_commands, _meshes, _materials);
 }
