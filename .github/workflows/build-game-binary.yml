@@ -79,5 +79,5 @@ jobs:
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Pong-${{ matrix.os }}
+          name: ${{ needs.get-name.outputs.name }}-${{ matrix.os }}
           path: dist/
