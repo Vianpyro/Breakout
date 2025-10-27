@@ -7,10 +7,22 @@ on:
 permissions:
   contents: read
 
+outputs:
+  name:
+    description: "Lowercased repository name (owner/name)"
+    value: ${{ jobs.build.outputs.name }}
+  owner:
+    description: "Lowercased repository owner"
+    value: ${{ jobs.build.outputs.owner }}
+
 jobs:
   build:
     name: Normalize Repository Name
     runs-on: ubuntu-latest
+
+    outputs:
+      name: ${{ steps.repo_name.outputs.name }}
+      owner: ${{ steps.repo_name.outputs.owner }}
 
     steps:
       - name: Checkout repository
