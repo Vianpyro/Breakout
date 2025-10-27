@@ -1,13 +1,13 @@
 {
-  "editor.defaultFormatter": "rust-lang.rust-analyzer",
-  "editor.formatOnSave": true,
-  "editor.insertSpaces": true,
-  "editor.tabSize": 4,
-  "files.insertFinalNewline": true,
-  "files.trimFinalNewlines": true,
-  "files.trimTrailingWhitespace": true,
-  "[yaml]": {
-    "editor.tabSize": 2
-  },
-  "rust-analyzer.rustfmt.extraArgs": ["--config", "max_width=160"]
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "[yaml]": {
+        "editor.tabSize": 2
+    },
+    "rust-analyzer.rustfmt.extraArgs": ["--config", "max_width=160"]
 }
