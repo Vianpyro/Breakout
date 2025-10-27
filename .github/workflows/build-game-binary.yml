@@ -8,6 +8,11 @@ permissions:
   contents: read
 
 jobs:
+  get-name:
+    name: Get binary name
+    uses: ./.github/workflows/normalize-repository-name.yml
+    secrets: inherit
+
   build:
     name: Build Game Binaries
     runs-on: ${{ matrix.os }}
@@ -24,7 +29,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y pkg-config libasound2-dev libudev-dev
+          sudo apt-get install -y pkg-config libudev-dev libwayland-dev libasound2-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -38,10 +43,10 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           mkdir -p dist
-          if [ -f target/release/rust-pong ]; then
-            cp target/release/rust-pong dist/
-          elif [ -f target/release/Rust-Pong ]; then
-            cp target/release/Rust-Pong dist/
+          if [ -f target/release/${{ steps.get-name.outputs.name }} ]; then
+            cp target/release/${{ steps.get-name.outputs.name }} dist/
+          elif [ -f target/release/${{ steps.get-name.outputs.name | capitalize }} ]; then
+            cp target/release/${{ steps.get-name.outputs.name | capitalize }} dist/
           fi
         shell: bash
 
@@ -49,7 +54,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mkdir dist
-          copy target\release\rust-pong.exe dist\
+          copy target\release\${{ steps.get-name.outputs.name | capitalize }}.exe dist\
         shell: pwsh
 
       - name: Upload binary artifact
