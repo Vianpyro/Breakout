@@ -19,8 +19,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Normalize repository name
+      - name: Normalize repository owner and name
+        id: repo_normalized
+        run: |
+          echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >>
+          echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Extract repository owner and name
         id: repo_name
         run: |
-          echo "name=$(echo '${{ github.repository_name }}' | tr '[:upper:]' '[:lower:]')"
-          echo "name=$(echo '${{ github.repository_name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "owner=$(echo '${{ steps.repo_normalized.outputs.owner }}' | cut -d'/' -f1)"
+          echo "name=$(echo '${{ steps.repo_normalized.outputs.name }}' | cut -d'/' -f2)"
+          echo "owner=$(echo '${{ steps.repo_normalized.outputs.owner }}' | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
+          echo "name=$(echo '${{ steps.repo_normalized.outputs.name }}' | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
