@@ -49,7 +49,7 @@ jobs:
           first="${name:0:1}"
           rest="${name:1}"
           first_up="$(tr '[:lower:]' '[:upper:]' <<< "$first")"
-          cap_name="$first_up$rest"
+          capitalized_name="$first_up$rest"
 
           if [ -f "target/release/$name" ]; then
             cp "target/release/$name" dist/
