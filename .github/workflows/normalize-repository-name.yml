@@ -3,9 +3,6 @@ name: Normalize Repository Name
 on:
   workflow_dispatch:
   workflow_call: {}
-  push:
-    branches:
-      - '**'
 
 permissions:
   contents: read
