@@ -3,7 +3,9 @@ name: Release Build
 on:
   workflow_dispatch:
   workflow_call: {}
-  push: null
+  push:
+    branches:
+      - '**'
 
 permissions:
   contents: read
@@ -19,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v*
+        uses: actions/checkout@v5
 
       - name: Normalize repository name
         id: repo_name
