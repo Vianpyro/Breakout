@@ -2,18 +2,17 @@ name: Normalize Repository Name
 
 on:
   workflow_dispatch:
-  workflow_call: {}
+  workflow_call:
+    outputs:
+      name:
+        description: "Lowercased repository name (owner/name)"
+        value: ${{ jobs.build.outputs.name }}
+      owner:
+        description: "Lowercased repository owner"
+        value: ${{ jobs.build.outputs.owner }}
 
 permissions:
   contents: read
-
-outputs:
-  name:
-    description: "Lowercased repository name (owner/name)"
-    value: ${{ jobs.build.outputs.name }}
-  owner:
-    description: "Lowercased repository owner"
-    value: ${{ jobs.build.outputs.owner }}
 
 jobs:
   build:
