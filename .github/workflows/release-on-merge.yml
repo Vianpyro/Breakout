@@ -32,20 +32,20 @@ jobs:
       - name: Download build artifacts (Linux)
         uses: actions/download-artifact@v4
         with:
-          name: Pong-ubuntu-latest
-          path: dist/Pong-ubuntu-latest
+          name: ${{ needs.get-name.outputs.name }}-ubuntu-latest
+          path: dist/${{ needs.get-name.outputs.name }}-ubuntu-latest
 
       - name: Download build artifacts (Windows)
         uses: actions/download-artifact@v4
         with:
-          name: Pong-windows-latest
-          path: dist/Pong-windows-latest
+          name: ${{ needs.get-name.outputs.name }}-windows-latest
+          path: dist/${{ needs.get-name.outputs.name }}-windows-latest
 
       - name: Download build artifacts (macOS)
         uses: actions/download-artifact@v4
         with:
-          name: Pong-macos-latest
-          path: dist/Pong-macos-latest
+          name: ${{ needs.get-name.outputs.name }}-macos-latest
+          path: dist/${{ needs.get-name.outputs.name }}-macos-latest
 
       - name: Rename and flatten binaries
         run: |
@@ -55,27 +55,27 @@ jobs:
           FIRST="${NAME:0:1}"
           REST="${NAME:1}"
           FIRST_UP="$(tr '[:lower:]' '[:upper:]' <<< "$FIRST")"
-          CAP="$FIRST_UP$REST"
+          CAPITALIZED="$FIRST_UP$REST"
 
           # Linux
-          if [[ -f dist/Pong-ubuntu-latest/$NAME ]]; then
-            cp dist/Pong-ubuntu-latest/$NAME dist/${NAME}-linux
-          elif [[ -f dist/Pong-ubuntu-latest/$CAP ]]; then
-            cp dist/Pong-ubuntu-latest/$CAP dist/${NAME}-linux
+          if [[ -f dist/${{ needs.get-name.outputs.name }}-ubuntu-latest/$NAME ]]; then
+            cp dist/${{ needs.get-name.outputs.name }}-ubuntu-latest/$NAME dist/${NAME}-linux
+          elif [[ -f dist/${{ needs.get-name.outputs.name }}-ubuntu-latest/$CAPITALIZED ]]; then
+            cp dist/${{ needs.get-name.outputs.name }}-ubuntu-latest/$CAPITALIZED dist/${NAME}-linux
           fi
 
           # macOS
-          if [[ -f dist/Pong-macos-latest/$NAME ]]; then
-            cp dist/Pong-macos-latest/$NAME dist/${NAME}-macos
-          elif [[ -f dist/Pong-macos-latest/$CAP ]]; then
-            cp dist/Pong-macos-latest/$CAP dist/${NAME}-macos
+          if [[ -f dist/${{ needs.get-name.outputs.name }}-macos-latest/$NAME ]]; then
+            cp dist/${{ needs.get-name.outputs.name }}-macos-latest/$NAME dist/${NAME}-macos
+          elif [[ -f dist/${{ needs.get-name.outputs.name }}-macos-latest/$CAPITALIZED ]]; then
+            cp dist/${{ needs.get-name.outputs.name }}-macos-latest/$CAPITALIZED dist/${NAME}-macos
           fi
 
           # Windows
-          if [[ -f dist/Pong-windows-latest/${NAME}.exe ]]; then
-            cp dist/Pong-windows-latest/${NAME}.exe dist/${NAME}-windows.exe
-          elif [[ -f dist/Pong-windows-latest/${CAP}.exe ]]; then
-            cp dist/Pong-windows-latest/${CAP}.exe dist/${NAME}-windows.exe
+          if [[ -f dist/${{ needs.get-name.outputs.name }}-windows-latest/${NAME}.exe ]]; then
+            cp dist/${{ needs.get-name.outputs.name }}-windows-latest/${NAME}.exe dist/${NAME}-windows.exe
+          elif [[ -f dist/${{ needs.get-name.outputs.name }}-windows-latest/${CAPITALIZED}.exe ]]; then
+            cp dist/${{ needs.get-name.outputs.name }}-windows-latest/${CAPITALIZED}.exe dist/${NAME}-windows.exe
           fi
 
       - name: Retrieve version from Cargo.toml
