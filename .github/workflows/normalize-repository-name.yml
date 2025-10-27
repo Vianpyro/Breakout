@@ -1,4 +1,4 @@
-name: Release Build
+name: Normalize Repository Name
 
 on:
   workflow_dispatch:
@@ -12,8 +12,8 @@ permissions:
 
 jobs:
   build:
-    name: Build Game Binaries
-    runs-on: ${{ matrix.os }}
+    name: Normalize Repository Name
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
