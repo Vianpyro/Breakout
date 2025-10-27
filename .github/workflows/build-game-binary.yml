@@ -43,10 +43,17 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           mkdir -p dist
-          if [ -f target/release/${{ steps.get-name.outputs.name }} ]; then
-            cp target/release/${{ steps.get-name.outputs.name }} dist/
-          elif [ -f target/release/${{ steps.get-name.outputs.name | capitalize }} ]; then
-            cp target/release/${{ steps.get-name.outputs.name | capitalize }} dist/
+          name='${{ steps.get-name.outputs.name }}'
+          # Capitalize first character (leave rest as-is)
+          first="${name:0:1}"
+          rest="${name:1}"
+          first_up="$(tr '[:lower:]' '[:upper:]' <<< "$first")"
+          cap_name="$first_up$rest"
+
+          if [ -f "target/release/$name" ]; then
+            cp "target/release/$name" dist/
+          elif [ -f "target/release/$capitalized_name" ]; then
+            cp "target/release/$capitalized_name" dist/
           fi
         shell: bash
 
@@ -54,7 +61,18 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mkdir dist
-          copy target\release\${{ steps.get-name.outputs.name | capitalize }}.exe dist\
+          $name = '${{ steps.get-name.outputs.name }}'
+          if ($name.Length -ge 1) {
+            $capitalized_name = $name.Substring(0,1).ToUpper() + $name.Substring(1)
+          } else {
+            $capitalized_name = $name
+          }
+
+          if (Test-Path "target\release\$name.exe") {
+            Copy-Item "target\release\$name.exe" dist\
+          } elseif (Test-Path "target\release\$capitalized_name.exe") {
+            Copy-Item "target\release\$capitalized_name.exe" dist\
+          }
         shell: pwsh
 
       - name: Upload binary artifact
