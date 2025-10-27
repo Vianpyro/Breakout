@@ -1,0 +1,27 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+  workflow_call: {}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Game Binaries
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v*
+
+      - name: Normalize repository name
+        id: repo_name
+        run: |
+          echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')"
+          echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
