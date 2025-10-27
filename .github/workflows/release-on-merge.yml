@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "Cargo.toml" # Trigger only on version changes since a workflow verifies version bumps on Rust changes
+      - 'Cargo.toml' # Trigger only on version changes since a workflow verifies version bumps on Rust changes
 
 permissions:
   contents: write
@@ -27,40 +27,49 @@ jobs:
       - name: Download build artifacts (Linux)
         uses: actions/download-artifact@v4
         with:
-          name: Pong-ubuntu-latest
-          path: dist/Pong-ubuntu-latest
+          name: ${{ needs.build.outputs.name }}-ubuntu-latest
+          path: dist/${{ needs.build.outputs.name }}-ubuntu-latest
 
       - name: Download build artifacts (Windows)
         uses: actions/download-artifact@v4
         with:
-          name: Pong-windows-latest
-          path: dist/Pong-windows-latest
+          name: ${{ needs.build.outputs.name }}-windows-latest
+          path: dist/${{ needs.build.outputs.name }}-windows-latest
 
       - name: Download build artifacts (macOS)
         uses: actions/download-artifact@v4
         with:
-          name: Pong-macos-latest
-          path: dist/Pong-macos-latest
+          name: ${{ needs.build.outputs.name }}-macos-latest
+          path: dist/${{ needs.build.outputs.name }}-macos-latest
 
       - name: Rename and flatten binaries
         run: |
+          NAME='${{ needs.build.outputs.name }}'
+          # Capitalize first character
+          FIRST="${NAME:0:1}"
+          REST="${NAME:1}"
+          FIRST_UP="$(tr '[:lower:]' '[:upper:]' <<< "$FIRST")"
+          CAPITALIZED="$FIRST_UP$REST"
+
           # Linux
-          if [[ -f dist/Pong-ubuntu-latest/rust-pong ]]; then
-            cp dist/Pong-ubuntu-latest/rust-pong dist/rust-pong-linux
-          elif [[ -f dist/Pong-ubuntu-latest/Rust-Pong ]]; then
-            cp dist/Pong-ubuntu-latest/Rust-Pong dist/rust-pong-linux
+          if [[ -f dist/${{ needs.build.outputs.name }}-ubuntu-latest/$NAME ]]; then
+            cp dist/${{ needs.build.outputs.name }}-ubuntu-latest/$NAME dist/${NAME}-linux
+          elif [[ -f dist/${{ needs.build.outputs.name }}-ubuntu-latest/$CAPITALIZED ]]; then
+            cp dist/${{ needs.build.outputs.name }}-ubuntu-latest/$CAPITALIZED dist/${NAME}-linux
           fi
+
           # macOS
-          if [[ -f dist/Pong-macos-latest/rust-pong ]]; then
-            cp dist/Pong-macos-latest/rust-pong dist/rust-pong-macos
-          elif [[ -f dist/Pong-macos-latest/Rust-Pong ]]; then
-            cp dist/Pong-macos-latest/Rust-Pong dist/rust-pong-macos
+          if [[ -f dist/${{ needs.build.outputs.name }}-macos-latest/$NAME ]]; then
+            cp dist/${{ needs.build.outputs.name }}-macos-latest/$NAME dist/${NAME}-macos
+          elif [[ -f dist/${{ needs.build.outputs.name }}-macos-latest/$CAPITALIZED ]]; then
+            cp dist/${{ needs.build.outputs.name }}-macos-latest/$CAPITALIZED dist/${NAME}-macos
           fi
+
           # Windows
-          if [[ -f dist/Pong-windows-latest/rust-pong.exe ]]; then
-            cp dist/Pong-windows-latest/rust-pong.exe dist/rust-pong-windows.exe
-          elif [[ -f dist/Pong-windows-latest/Rust-Pong.exe ]]; then
-            cp dist/Pong-windows-latest/Rust-Pong.exe dist/rust-pong-windows.exe
+          if [[ -f dist/${{ needs.build.outputs.name }}-windows-latest/${NAME}.exe ]]; then
+            cp dist/${{ needs.build.outputs.name }}-windows-latest/${NAME}.exe dist/${NAME}-windows.exe
+          elif [[ -f dist/${{ needs.build.outputs.name }}-windows-latest/${CAPITALIZED}.exe ]]; then
+            cp dist/${{ needs.build.outputs.name }}-windows-latest/${CAPITALIZED}.exe dist/${NAME}-windows.exe
           fi
 
       - name: Retrieve version from Cargo.toml
@@ -75,12 +84,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
-          name: "Version ${{ steps.get_version.outputs.version }}"
+          name: 'Version ${{ steps.get_version.outputs.version }}'
           generate_release_notes: true
           draft: false
           prerelease: false
           fail_on_unmatched_files: false
           files: |
-            dist/rust-pong-linux
-            dist/rust-pong-macos
-            dist/rust-pong-windows.exe
+            dist/${{ needs.build.outputs.name }}-linux
+            dist/${{ needs.build.outputs.name }}-macos
+            dist/${{ needs.build.outputs.name }}-windows.exe

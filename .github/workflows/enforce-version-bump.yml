@@ -3,7 +3,7 @@ name: Enforce version bump on Rust changes
 on:
   pull_request:
     paths:
-      - "**/*.rs"
+      - '**/*.rs'
     branches:
       - main
 

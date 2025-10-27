@@ -9,10 +9,7 @@
             "type": "lldb",
             "request": "launch",
             "cargo": {
-                "args": [
-                    "run",
-                    "--bin=Breakout"
-                ]
+                "args": ["run", "--bin=Breakout"]
             },
             "args": []
         },
@@ -21,10 +18,7 @@
             "type": "lldb",
             "request": "launch",
             "cargo": {
-                "args": [
-                    "run",
-                    "--bin=Breakout"
-                ]
+                "args": ["run", "--bin=Breakout"]
             },
             "args": []
         },
@@ -33,10 +27,7 @@
             "type": "lldb",
             "request": "launch",
             "cargo": {
-                "args": [
-                    "test",
-                    "--bin=Breakout"
-                ]
+                "args": ["test", "--bin=Breakout"]
             }
         }
     ]

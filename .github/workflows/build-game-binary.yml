@@ -2,14 +2,27 @@ name: Release Build
 
 on:
   workflow_dispatch:
-  workflow_call: {}
+  workflow_call:
+    outputs:
+      name:
+        description: 'Lowercased repository name'
+        value: ${{ jobs.get-name.outputs.name }}
+      owner:
+        description: 'Lowercased repository owner'
+        value: ${{ jobs.get-name.outputs.owner }}
 
 permissions:
   contents: read
 
 jobs:
+  get-name:
+    name: Get future binary name
+    uses: ./.github/workflows/normalize-repository-name.yml
+    secrets: inherit
+
   build:
     name: Build Game Binaries
+    needs: get-name
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -24,7 +37,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y pkg-config libasound2-dev libudev-dev
+          sudo apt-get install -y pkg-config libudev-dev libwayland-dev libasound2-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -38,10 +51,17 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           mkdir -p dist
-          if [ -f target/release/rust-pong ]; then
-            cp target/release/rust-pong dist/
-          elif [ -f target/release/Rust-Pong ]; then
-            cp target/release/Rust-Pong dist/
+          name='${{ needs.get-name.outputs.name }}'
+          # Capitalize first character (leave rest as-is)
+          first="${name:0:1}"
+          rest="${name:1}"
+          first_up="$(tr '[:lower:]' '[:upper:]' <<< "$first")"
+          capitalized_name="$first_up$rest"
+
+          if [ -f "target/release/$name" ]; then
+            cp "target/release/$name" dist/
+          elif [ -f "target/release/$capitalized_name" ]; then
+            cp "target/release/$capitalized_name" dist/
           fi
         shell: bash
 
@@ -49,11 +69,22 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mkdir dist
-          copy target\release\rust-pong.exe dist\
+          $name = '${{ needs.get-name.outputs.name }}'
+          if ($name.Length -ge 1) {
+            $capitalized_name = $name.Substring(0,1).ToUpper() + $name.Substring(1)
+          } else {
+            $capitalized_name = $name
+          }
+
+          if (Test-Path "target\release\$name.exe") {
+            Copy-Item "target\release\$name.exe" dist\
+          } elseif (Test-Path "target\release\$capitalized_name.exe") {
+            Copy-Item "target\release\$capitalized_name.exe" dist\
+          }
         shell: pwsh
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Pong-${{ matrix.os }}
+          name: ${{ needs.get-name.outputs.name }}-${{ matrix.os }}
           path: dist/
