@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "Cargo.toml" # Trigger only on version changes since a workflow verifies version bumps on Rust changes
+      - 'Cargo.toml' # Trigger only on version changes since a workflow verifies version bumps on Rust changes
 
 permissions:
   contents: write
@@ -75,7 +75,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
-          name: "Version ${{ steps.get_version.outputs.version }}"
+          name: 'Version ${{ steps.get_version.outputs.version }}'
           generate_release_notes: true
           draft: false
           prerelease: false

@@ -5,10 +5,10 @@ on:
   workflow_call:
     outputs:
       name:
-        description: "Lowercased repository name (owner/name)"
+        description: 'Lowercased repository name (owner/name)'
         value: ${{ jobs.build.outputs.name }}
       owner:
-        description: "Lowercased repository owner"
+        description: 'Lowercased repository owner'
         value: ${{ jobs.build.outputs.owner }}
 
 permissions:
