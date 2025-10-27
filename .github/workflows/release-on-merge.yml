@@ -16,9 +16,14 @@ jobs:
     uses: ./.github/workflows/build-game-binary.yml
     secrets: inherit
 
+  get-name:
+    name: Get normalized repository name
+    uses: ./.github/workflows/normalize-repository-name.yml
+    secrets: inherit
+
   create_release:
     name: Create Release and Upload Assets
-    needs: build
+    needs: [build, get-name]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -44,23 +49,33 @@ jobs:
 
       - name: Rename and flatten binaries
         run: |
+          # Get normalized name from reusable job
+          NAME='${{ needs.get-name.outputs.name }}'
+          # Capitalize first character
+          FIRST="${NAME:0:1}"
+          REST="${NAME:1}"
+          FIRST_UP="$(tr '[:lower:]' '[:upper:]' <<< "$FIRST")"
+          CAP="$FIRST_UP$REST"
+
           # Linux
-          if [[ -f dist/Pong-ubuntu-latest/rust-pong ]]; then
-            cp dist/Pong-ubuntu-latest/rust-pong dist/rust-pong-linux
-          elif [[ -f dist/Pong-ubuntu-latest/Rust-Pong ]]; then
-            cp dist/Pong-ubuntu-latest/Rust-Pong dist/rust-pong-linux
+          if [[ -f dist/Pong-ubuntu-latest/$NAME ]]; then
+            cp dist/Pong-ubuntu-latest/$NAME dist/${NAME}-linux
+          elif [[ -f dist/Pong-ubuntu-latest/$CAP ]]; then
+            cp dist/Pong-ubuntu-latest/$CAP dist/${NAME}-linux
           fi
+
           # macOS
-          if [[ -f dist/Pong-macos-latest/rust-pong ]]; then
-            cp dist/Pong-macos-latest/rust-pong dist/rust-pong-macos
-          elif [[ -f dist/Pong-macos-latest/Rust-Pong ]]; then
-            cp dist/Pong-macos-latest/Rust-Pong dist/rust-pong-macos
+          if [[ -f dist/Pong-macos-latest/$NAME ]]; then
+            cp dist/Pong-macos-latest/$NAME dist/${NAME}-macos
+          elif [[ -f dist/Pong-macos-latest/$CAP ]]; then
+            cp dist/Pong-macos-latest/$CAP dist/${NAME}-macos
           fi
+
           # Windows
-          if [[ -f dist/Pong-windows-latest/rust-pong.exe ]]; then
-            cp dist/Pong-windows-latest/rust-pong.exe dist/rust-pong-windows.exe
-          elif [[ -f dist/Pong-windows-latest/Rust-Pong.exe ]]; then
-            cp dist/Pong-windows-latest/Rust-Pong.exe dist/rust-pong-windows.exe
+          if [[ -f dist/Pong-windows-latest/${NAME}.exe ]]; then
+            cp dist/Pong-windows-latest/${NAME}.exe dist/${NAME}-windows.exe
+          elif [[ -f dist/Pong-windows-latest/${CAP}.exe ]]; then
+            cp dist/Pong-windows-latest/${CAP}.exe dist/${NAME}-windows.exe
           fi
 
       - name: Retrieve version from Cargo.toml
@@ -81,6 +96,6 @@ jobs:
           prerelease: false
           fail_on_unmatched_files: false
           files: |
-            dist/rust-pong-linux
-            dist/rust-pong-macos
-            dist/rust-pong-windows.exe
+            dist/${{ needs.get-name.outputs.name }}-linux
+            dist/${{ needs.get-name.outputs.name }}-macos
+            dist/${{ needs.get-name.outputs.name }}-windows.exe
