@@ -16,6 +16,7 @@ jobs:
     permissions:
       contents: write
       statuses: write
+      workflows: write
     runs-on: ubuntu-latest
 
     steps:
