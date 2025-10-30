@@ -1,5 +1,10 @@
 use bevy::prelude::*;
 
+const DEFAULT_VIEWPORT_WIDTH: f32 = 1920.0;
+const DEFAULT_VIEWPORT_HEIGHT: f32 = 1080.0;
+pub const DEFAULT_VIRTUAL_WIDTH: f32 = 1280.0;
+pub const DEFAULT_VIRTUAL_HEIGHT: f32 = 720.0;
+
 // Virtual resolution (in world units) that should be visible on screen regardless
 // of the physical pixel resolution. For example, a height of 720 means the camera
 // will display 720 world units vertically; the projection scale is adjusted so
@@ -12,7 +17,10 @@ pub struct VirtualResolution {
 
 impl Default for VirtualResolution {
     fn default() -> Self {
-        Self { width: 1280.0, height: 720.0 }
+        Self {
+            width: DEFAULT_VIRTUAL_WIDTH,
+            height: DEFAULT_VIRTUAL_HEIGHT,
+        }
     }
 }
 
@@ -46,10 +54,10 @@ pub struct WindowViewport {
 impl Default for WindowViewport {
     fn default() -> Self {
         Self {
-            half_width: 1920.0 / 2.0,
-            half_height: 1080.0 / 2.0,
-            pixel_width: 1920.0,
-            pixel_height: 1080.0,
+            half_width: DEFAULT_VIEWPORT_WIDTH / 2.0,
+            half_height: DEFAULT_VIEWPORT_HEIGHT / 2.0,
+            pixel_width: DEFAULT_VIEWPORT_WIDTH,
+            pixel_height: DEFAULT_VIEWPORT_HEIGHT,
             scale: 1.0,
         }
     }

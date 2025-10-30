@@ -1,6 +1,6 @@
 #![windows_subsystem = "windows"]
 
-mod player;
+mod game;
 mod viewport;
 use bevy::app::AppExit;
 use bevy::prelude::*;
@@ -9,7 +9,7 @@ use viewport::{VirtualResolution, WindowViewport};
 
 fn main() {
     App::new()
-        .insert_resource(VirtualResolution { width: 1280.0, height: 720.0 })
+        .insert_resource(VirtualResolution::default())
         .insert_resource(viewport::ScalingStrategy::AutoMin)
         .insert_resource(WindowViewport::default())
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -30,7 +30,7 @@ fn main() {
         )
         .add_systems(PreUpdate, exit_on_esc_system)
         .add_systems(Update, (viewport::maybe_update_window_viewport, viewport::update_camera_on_resize))
-        .add_systems(Update, player::paddle::paddle_movement_system)
+        .add_systems(Update, game::paddle::paddle_movement_system)
         .run();
 }
 
@@ -46,5 +46,5 @@ fn spawn_camera(mut commands: Commands) {
 }
 
 fn spawn_map(mut _commands: Commands, mut _meshes: ResMut<Assets<Mesh>>, mut _materials: ResMut<Assets<ColorMaterial>>) {
-    player::paddle::create_paddle(_commands, _meshes, _materials);
+    game::paddle::create_paddle(_commands, _meshes, _materials);
 }
