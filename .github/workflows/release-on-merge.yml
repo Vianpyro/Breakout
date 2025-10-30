@@ -52,24 +52,24 @@ jobs:
           CAPITALIZED="$FIRST_UP$REST"
 
           # Linux
-          if [[ -f dist/${{ needs.build.outputs.name }}-ubuntu-latest/$NAME ]]; then
-            cp dist/${{ needs.build.outputs.name }}-ubuntu-latest/$NAME dist/${NAME}-linux
-          elif [[ -f dist/${{ needs.build.outputs.name }}-ubuntu-latest/$CAPITALIZED ]]; then
-            cp dist/${{ needs.build.outputs.name }}-ubuntu-latest/$CAPITALIZED dist/${NAME}-linux
+          if [[ -f "dist/${{ needs.build.outputs.name }}-ubuntu-latest/${NAME}" ]]; then
+            cp "dist/${{ needs.build.outputs.name }}-ubuntu-latest/${NAME}" "dist/${NAME}-linux"
+          elif [[ -f "dist/${{ needs.build.outputs.name }}-ubuntu-latest/${CAPITALIZED}" ]]; then
+            cp "dist/${{ needs.build.outputs.name }}-ubuntu-latest/${CAPITALIZED}" "dist/${NAME}-linux"
           fi
 
           # macOS
-          if [[ -f dist/${{ needs.build.outputs.name }}-macos-latest/$NAME ]]; then
-            cp dist/${{ needs.build.outputs.name }}-macos-latest/$NAME dist/${NAME}-macos
-          elif [[ -f dist/${{ needs.build.outputs.name }}-macos-latest/$CAPITALIZED ]]; then
-            cp dist/${{ needs.build.outputs.name }}-macos-latest/$CAPITALIZED dist/${NAME}-macos
+          if [[ -f "dist/${{ needs.build.outputs.name }}-macos-latest/${NAME}" ]]; then
+            cp "dist/${{ needs.build.outputs.name }}-macos-latest/${NAME}" "dist/${NAME}-macos"
+          elif [[ -f "dist/${{ needs.build.outputs.name }}-macos-latest/${CAPITALIZED}" ]]; then
+            cp "dist/${{ needs.build.outputs.name }}-macos-latest/${CAPITALIZED}" "dist/${NAME}-macos"
           fi
 
           # Windows
-          if [[ -f dist/${{ needs.build.outputs.name }}-windows-latest/${NAME}.exe ]]; then
-            cp dist/${{ needs.build.outputs.name }}-windows-latest/${NAME}.exe dist/${NAME}-windows.exe
-          elif [[ -f dist/${{ needs.build.outputs.name }}-windows-latest/${CAPITALIZED}.exe ]]; then
-            cp dist/${{ needs.build.outputs.name }}-windows-latest/${CAPITALIZED}.exe dist/${NAME}-windows.exe
+          if [[ -f "dist/${{ needs.build.outputs.name }}-windows-latest/${NAME}.exe" ]]; then
+            cp "dist/${{ needs.build.outputs.name }}-windows-latest/${NAME}.exe" "dist/${NAME}-windows.exe"
+          elif [[ -f "dist/${{ needs.build.outputs.name }}-windows-latest/${CAPITALIZED}.exe" ]]; then
+            cp "dist/${{ needs.build.outputs.name }}-windows-latest/${CAPITALIZED}.exe" "dist/${NAME}-windows.exe"
           fi
 
       - name: Retrieve version from Cargo.toml
