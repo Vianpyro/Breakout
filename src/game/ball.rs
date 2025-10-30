@@ -3,16 +3,16 @@ use bevy::prelude::*;
 use rand::Rng;
 
 const BALL_COLOR: Color = Color::srgb(1.0, 1.0, 1.0);
-const BALL_SPEED: f32 = PADDLE_SPEED * 0.75;
-const BALL_SIZE: Vec2 = Vec2::new(15.0, 15.0);
+pub const BALL_SPEED: f32 = PADDLE_SPEED * 0.75;
+pub const BALL_RADIUS: f32 = 7.5;
 
 #[derive(Component)]
 pub struct Ball {
-    velocity: Vec2,
+    pub velocity: Vec2,
 }
 
 pub fn create_ball(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<ColorMaterial>) {
-    let ball_mesh = meshes.add(Circle::new(BALL_SIZE.x / 1.9));
+    let ball_mesh = meshes.add(Circle::new(BALL_RADIUS));
     let ball_material = materials.add(ColorMaterial::from(BALL_COLOR));
 
     let mut initial_velocity = Vec2::ZERO;

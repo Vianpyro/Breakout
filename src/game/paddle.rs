@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 const PADDLE_ACCELERATION: f32 = 2500.0;
 const PADDLE_COLOR: Color = Color::srgb(1.0, 1.0, 1.0);
-const PADDLE_SIZE: Vec2 = Vec2::new(DEFAULT_VIRTUAL_WIDTH / 15.0, DEFAULT_VIRTUAL_HEIGHT / 40.0);
+pub const PADDLE_SIZE: Vec2 = Vec2::new(DEFAULT_VIRTUAL_WIDTH / 10.0, DEFAULT_VIRTUAL_HEIGHT / 40.0);
 pub const PADDLE_SPEED: f32 = 750.0;
 const PADDLE_START_Y: f32 = -DEFAULT_VIRTUAL_HEIGHT / 2.0 + PADDLE_SIZE.y * 2.0;
 
