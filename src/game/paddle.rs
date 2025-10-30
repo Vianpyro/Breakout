@@ -1,18 +1,18 @@
 use crate::viewport::{DEFAULT_VIRTUAL_HEIGHT, DEFAULT_VIRTUAL_WIDTH};
 use bevy::prelude::*;
 
-const PADDLE_START_Y: f32 = -DEFAULT_VIRTUAL_HEIGHT / 2.0 + PADDLE_SIZE.y * 2.0;
-const PADDLE_SIZE: Vec2 = Vec2::new(DEFAULT_VIRTUAL_WIDTH / 15.0, DEFAULT_VIRTUAL_HEIGHT / 40.0);
+const PADDLE_ACCELERATION: f32 = 2500.0;
 const PADDLE_COLOR: Color = Color::srgb(1.0, 1.0, 1.0);
-const PADDLE_SPEED: f32 = 650.0;
-const PADDLE_ACCELERATION: f32 = 2000.0;
+const PADDLE_SIZE: Vec2 = Vec2::new(DEFAULT_VIRTUAL_WIDTH / 15.0, DEFAULT_VIRTUAL_HEIGHT / 40.0);
+pub const PADDLE_SPEED: f32 = 750.0;
+const PADDLE_START_Y: f32 = -DEFAULT_VIRTUAL_HEIGHT / 2.0 + PADDLE_SIZE.y * 2.0;
 
 #[derive(Component)]
 pub struct Paddle {
     pub velocity: f32,
 }
 
-pub fn create_paddle(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>) {
+pub fn create_paddle(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<ColorMaterial>) {
     let paddle_mesh = meshes.add(Rectangle::new(PADDLE_SIZE.x, PADDLE_SIZE.y));
     let paddle_material = materials.add(ColorMaterial::from(PADDLE_COLOR));
     commands.spawn((
