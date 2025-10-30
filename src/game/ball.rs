@@ -1,10 +1,10 @@
-use crate::game::paddle::PADDLE_SPEED;
+use crate::game::paddle::{PADDLE_SIZE, PADDLE_SPEED};
 use bevy::prelude::*;
 use rand::Rng;
 
 const BALL_COLOR: Color = Color::srgb(1.0, 1.0, 1.0);
 pub const BALL_SPEED: f32 = PADDLE_SPEED * 0.75;
-pub const BALL_RADIUS: f32 = 7.5;
+pub const BALL_RADIUS: f32 = PADDLE_SIZE.y / 2.0;
 
 #[derive(Component)]
 pub struct Ball {
@@ -36,10 +36,10 @@ pub fn ball_movement_system(time: Res<Time>, viewport: Res<crate::viewport::Wind
         transform.translation.y += ball.velocity.y * delta_time;
 
         // Bounce off walls
-        if transform.translation.x - BALL_SIZE.x / 2.0 <= -half_world_width || transform.translation.x + BALL_SIZE.x / 2.0 >= half_world_width {
+        if transform.translation.x - BALL_RADIUS / 2.0 <= -half_world_width || transform.translation.x + BALL_RADIUS / 2.0 >= half_world_width {
             ball.velocity.x = -ball.velocity.x;
         }
-        if transform.translation.y - BALL_SIZE.y / 2.0 <= -half_world_height || transform.translation.y + BALL_SIZE.y / 2.0 >= half_world_height {
+        if transform.translation.y - BALL_RADIUS / 2.0 <= -half_world_height || transform.translation.y + BALL_RADIUS / 2.0 >= half_world_height {
             ball.velocity.y = -ball.velocity.y;
         }
     }
