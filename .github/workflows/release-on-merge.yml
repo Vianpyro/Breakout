@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "Cargo.toml" # Trigger only on version changes since a workflow verifies version bumps on Rust changes
+      - 'Cargo.toml' # Trigger only on version changes since a workflow verifies version bumps on Rust changes
 
 permissions:
   contents: write
