@@ -32,13 +32,14 @@ fn main() {
             ),
         )
         .add_systems(PreUpdate, exit_on_esc_system)
-        .add_systems(Update, (viewport::maybe_update_window_viewport, viewport::update_camera_on_resize))
         .add_systems(
             Update,
             (
                 game::paddle::paddle_movement_system,
                 game::ball::ball_physics_system,
                 game::ball::ball_paddle_collision_system,
+                viewport::maybe_update_window_viewport,
+                viewport::update_camera_on_resize,
             ),
         )
         .run();
