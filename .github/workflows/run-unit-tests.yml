@@ -8,10 +8,9 @@ on:
     paths:
       - '**/*.rs'
       - 'Cargo.toml'
+    branches-ignore:
+      - main
   pull_request:
-    paths:
-      - '**/*.rs'
-      - 'Cargo.toml'
     branches:
       - main
 
