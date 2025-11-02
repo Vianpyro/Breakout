@@ -8,6 +8,12 @@ on:
     paths:
     - '**/*.rs'
     - 'Cargo.toml'
+  pull_request:
+    paths:
+      - '**/*.rs'
+      - 'Cargo.toml'
+    branches:
+      - main
 
 jobs:
   test:
