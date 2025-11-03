@@ -25,6 +25,7 @@ impl Default for VirtualResolution {
 }
 
 // Strategy for how the virtual resolution should be mapped to the window.
+#[allow(dead_code)]
 #[derive(Resource, Clone, Copy)]
 pub enum ScalingStrategy {
     FixedVertical,

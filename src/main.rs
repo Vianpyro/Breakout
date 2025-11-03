@@ -30,7 +30,7 @@ fn main() {
         )
         .add_systems(PreUpdate, exit_on_esc_system)
         .add_systems(Update, (viewport::maybe_update_window_viewport, viewport::update_camera_on_resize))
-        .add_systems(Update, game::paddle::paddle_movement_system)
+        .add_systems(Update, (game::paddle::paddle_movement_system, game::ball::ball_movement_system))
         .run();
 }
 
@@ -45,6 +45,7 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn(DirectionalLight::default());
 }
 
-fn spawn_map(mut _commands: Commands, mut _meshes: ResMut<Assets<Mesh>>, mut _materials: ResMut<Assets<ColorMaterial>>) {
-    game::paddle::create_paddle(_commands, _meshes, _materials);
+fn spawn_map(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>) {
+    game::paddle::create_paddle(&mut commands, &mut meshes, &mut materials);
+    game::ball::create_ball(&mut commands, &mut meshes, &mut materials);
 }
