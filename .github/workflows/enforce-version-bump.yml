@@ -1,4 +1,4 @@
-name: Enforce version bump on Rust changes
+name: Enforce version bump
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   enforce-version-bump:
-    name: Enforce version bump on Rust changes
+    name: Enforce version bump
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
