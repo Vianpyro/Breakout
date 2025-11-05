@@ -4,15 +4,12 @@ permissions:
   contents: read
 
 on:
-  push:
-    paths:
-      - '**/*.rs'
-      - 'Cargo.toml'
-    branches-ignore:
-      - main
   pull_request:
     branches:
       - main
+    paths:
+      - '**/*.rs'
+      - 'Cargo.toml'
 
 jobs:
   test:
