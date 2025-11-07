@@ -1,5 +1,6 @@
 use crate::viewport::{DEFAULT_VIRTUAL_HEIGHT, DEFAULT_VIRTUAL_WIDTH};
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 const PADDLE_ACCELERATION: f32 = 2500.0;
 const PADDLE_COLOR: Color = Color::srgb(1.0, 1.0, 1.0);
@@ -15,11 +16,20 @@ pub struct Paddle {
 pub fn create_paddle(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<ColorMaterial>) {
     let paddle_mesh = meshes.add(Rectangle::new(PADDLE_SIZE.x, PADDLE_SIZE.y));
     let paddle_material = materials.add(ColorMaterial::from(PADDLE_COLOR));
+
     commands.spawn((
+        Paddle { velocity: 0.0 },
         Mesh2d(paddle_mesh),
         MeshMaterial2d(paddle_material),
         Transform::from_translation(Vec3::new(0.0, PADDLE_START_Y, 0.0)),
-        Paddle { velocity: 0.0 },
+        GlobalTransform::default(),
+        Visibility::default(),
+        InheritedVisibility::default(),
+        ViewVisibility::default(),
+        RigidBody::KinematicPositionBased,
+        Collider::cuboid(PADDLE_SIZE.x / 2.0, PADDLE_SIZE.y / 2.0),
+        Restitution::coefficient(1.0),
+        Friction::coefficient(0.0),
     ));
 }
 
