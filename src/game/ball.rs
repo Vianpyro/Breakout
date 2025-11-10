@@ -1,7 +1,6 @@
 use crate::game::paddle::{PADDLE_SIZE, PADDLE_SPEED};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
-use rand::Rng;
 
 const BALL_COLOR: Color = Color::srgb(1.0, 1.0, 1.0);
 pub const BALL_SPEED: f32 = PADDLE_SPEED * 0.75;
@@ -10,44 +9,51 @@ pub const BALL_RADIUS: f32 = PADDLE_SIZE.y / 2.0;
 #[derive(Component)]
 pub struct Ball;
 
+#[derive(Component)]
+pub struct BallHeld;
+
 pub fn create_ball(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<ColorMaterial>) {
     let ball_mesh = meshes.add(Circle::new(BALL_RADIUS));
     let ball_material = materials.add(ColorMaterial::from(BALL_COLOR));
 
-    let mut initial_velocity = Vec2::ZERO;
-    randomize_velocity(&mut initial_velocity, BALL_SPEED, BALL_SPEED);
-
-    commands.spawn((
-        Ball,
-        Mesh2d(ball_mesh),
-        MeshMaterial2d(ball_material),
-        Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
-        GlobalTransform::default(),
-        Visibility::default(),
-        InheritedVisibility::default(),
-        ViewVisibility::default(),
-        RigidBody::Dynamic,
-        Collider::ball(BALL_RADIUS),
-        Velocity {
-            linvel: initial_velocity,
-            angvel: 0.0,
-        },
-        Restitution::coefficient(1.0),
-        Friction::coefficient(0.0),
-        GravityScale(0.0),
-        ActiveEvents::COLLISION_EVENTS,
-    ));
+    // While the ball is held, make it kinematic so we manually position it.
+    commands
+        .spawn((
+            // Rendering
+            Mesh2d(ball_mesh),
+            MeshMaterial2d(ball_material),
+            Transform::default(),
+            GlobalTransform::default(),
+            Visibility::default(),
+            InheritedVisibility::default(),
+            ViewVisibility::default(),
+        ))
+        .insert((
+            // Game logic
+            Ball, BallHeld,
+        ))
+        .insert((
+            // Physics
+            RigidBody::KinematicPositionBased,
+            Collider::ball(BALL_RADIUS),
+            Velocity::default(),
+            Restitution::coefficient(1.0),
+            Friction::coefficient(0.0),
+            GravityScale(0.0),
+            ActiveEvents::COLLISION_EVENTS,
+        ));
 }
 
 pub fn ball_physics_system(
     viewport: Res<crate::viewport::WindowViewport>,
-    mut ball_query: Query<(&mut Transform, &mut Velocity), With<Ball>>,
+    mut commands: Commands,
+    mut ball_query: Query<(Entity, &mut Transform, &mut Velocity), With<Ball>>,
     _time: Res<Time>,
 ) {
     let half_world_width = viewport.half_width;
     let half_world_height = viewport.half_height;
 
-    for (mut transform, mut velocity) in ball_query.iter_mut() {
+    for (entity, mut transform, mut velocity) in ball_query.iter_mut() {
         // Maintain constant speed
         let current_speed = velocity.linvel.length();
         if current_speed != 0.0 {
@@ -72,8 +78,9 @@ pub fn ball_physics_system(
 
         // Reset ball position if it goes below the paddle (game over condition)
         if transform.translation.y - BALL_RADIUS <= -half_world_height {
-            transform.translation = Vec3::new(0.0, 0.0, 0.0);
-            randomize_velocity(&mut velocity.linvel, BALL_SPEED, BALL_SPEED);
+            velocity.linvel = Vec2::ZERO;
+            velocity.angvel = 0.0;
+            commands.entity(entity).insert(RigidBody::KinematicPositionBased).insert(BallHeld);
         }
     }
 }
@@ -111,14 +118,43 @@ pub fn ball_paddle_collision_system(
     }
 }
 
-fn randomize_velocity(vector: &mut Vec2, x: f32, y: f32) {
-    let mut random_thread = rand::rng();
-    vector.x = match random_thread.random_bool(0.5) {
-        true => x,
-        false => -x,
+// While the ball has the `BallHeld` marker, keep it positioned just above the paddle.
+pub fn stick_ball_system(
+    paddle_query: Query<&Transform, (With<crate::game::paddle::Paddle>, Without<Ball>)>,
+    mut ball_query: Query<&mut Transform, (With<Ball>, With<BallHeld>)>,
+) {
+    let paddle_tf = match paddle_query.single() {
+        Ok(t) => t,
+        Err(_) => return,
     };
-    vector.y = match random_thread.random_bool(0.5) {
-        true => y,
-        false => -y,
-    };
+
+    // Position the ball centered on the paddle and just above it.
+    let paddle_top = paddle_tf.translation.y + (crate::game::paddle::PADDLE_SIZE.y / 2.0);
+    for mut ball_tf in ball_query.iter_mut() {
+        ball_tf.translation.x = paddle_tf.translation.x;
+        ball_tf.translation.y = paddle_top + BALL_RADIUS + 1.0;
+    }
+}
+
+pub fn launch_ball_system(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut commands: Commands,
+    paddle_query: Query<&crate::game::paddle::Paddle>,
+    mut held_balls: Query<(Entity, &mut Velocity), (With<Ball>, With<BallHeld>)>,
+) {
+    if !keyboard_input.just_pressed(KeyCode::ArrowUp) {
+        return;
+    }
+
+    let paddle_vel = paddle_query.single().map(|p| p.velocity).unwrap_or(0.0);
+
+    for (entity, mut velocity) in held_balls.iter_mut() {
+        // Switch to dynamic so physics takes over
+        commands.entity(entity).remove::<BallHeld>().insert(RigidBody::Dynamic);
+
+        // Give initial velocity: primarily upwards, with a little horizontal influence
+        let init_x = paddle_vel * 0.3;
+        velocity.linvel = Vec2::new(init_x, BALL_SPEED);
+        velocity.angvel = 0.0;
+    }
 }

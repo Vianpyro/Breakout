@@ -31,11 +31,12 @@ fn main() {
                 viewport::update_camera_on_resize,
             ),
         )
-        .add_systems(PreUpdate, exit_on_esc_system)
+        .add_systems(PreUpdate, (exit_on_esc_system, game::ball::stick_ball_system))
         .add_systems(
             Update,
             (
                 game::paddle::paddle_movement_system,
+                game::ball::launch_ball_system,
                 game::ball::ball_physics_system,
                 game::ball::ball_paddle_collision_system,
                 viewport::maybe_update_window_viewport,

@@ -31,6 +31,18 @@
             }
         },
         {
+            "label": "Clean old builds",
+            "type": "shell",
+            "command": "cargo clean",
+            "problemMatcher": [],
+            "presentation": {
+                "close": true
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        },
+        {
             "label": "Build Project",
             "type": "shell",
             "command": "cargo build",
@@ -41,7 +53,7 @@
             "runOptions": {
                 "runOn": "folderOpen"
             },
-            "dependsOn": "Update cargo"
+            "dependsOn": ["Update cargo", "Clean old builds"]
         }
     ]
 }
