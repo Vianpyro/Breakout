@@ -39,6 +39,7 @@ fn main() {
                 game::ball::launch_ball_system,
                 game::ball::ball_physics_system,
                 game::ball::ball_paddle_collision_system,
+                game::ball::ball_brick_collision_system,
                 viewport::maybe_update_window_viewport,
                 viewport::update_camera_on_resize,
             ),
@@ -61,4 +62,5 @@ fn spawn_map(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut mater
     game::paddle::create_paddle(&mut commands, &mut meshes, &mut materials);
     game::ball::create_ball(&mut commands, &mut meshes, &mut materials);
     game::walls::create_walls(&mut commands, viewport);
+    game::brick::create_brick(&mut commands, &mut meshes, &mut materials, Vec2::new(0.0, 0.0), Vec2::ZERO, 3);
 }

@@ -1,4 +1,7 @@
-use crate::game::paddle::{PADDLE_SIZE, PADDLE_SPEED};
+use crate::game::{
+    brick::hit_brick,
+    paddle::{PADDLE_SIZE, PADDLE_SPEED},
+};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -81,6 +84,34 @@ pub fn ball_physics_system(
             velocity.linvel = Vec2::ZERO;
             velocity.angvel = 0.0;
             commands.entity(entity).insert(RigidBody::KinematicPositionBased).insert(BallHeld);
+        }
+    }
+}
+
+pub fn ball_brick_collision_system(
+    mut commands: Commands,
+    mut collision_events: EventReader<CollisionEvent>,
+    mut ball_query: Query<&mut Velocity, With<Ball>>,
+    mut brick_query: Query<&mut crate::game::brick::Brick>,
+) {
+    for collision_event in collision_events.read() {
+        if let CollisionEvent::Started(h1, h2, _) = collision_event {
+            // Check if collision is between ball and brick
+            let (ball_entity, brick_entity) = if ball_query.get(*h1).is_ok() && brick_query.get(*h2).is_ok() {
+                (*h1, *h2)
+            } else if ball_query.get(*h2).is_ok() && brick_query.get(*h1).is_ok() {
+                (*h2, *h1)
+            } else {
+                continue;
+            };
+
+            if let Ok(mut ball_velocity) = ball_query.get_mut(ball_entity) {
+                // Invert ball's vertical velocity to simulate bounce
+                ball_velocity.linvel.y = -ball_velocity.linvel.y;
+
+                // Call hit_brick with a mutable reference to the brick query and its entity
+                hit_brick(&mut commands, &mut brick_query, brick_entity);
+            }
         }
     }
 }
