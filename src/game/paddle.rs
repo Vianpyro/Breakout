@@ -68,11 +68,16 @@ pub fn paddle_movement_system(
         // Move by current velocity
         transform.translation.x += paddle.velocity * delta_time;
 
-        // Clamp to world bounds
+        // Clamp to world bounds and reset velocity
         let half_paddle_width = PADDLE_SIZE.x / 2.0;
-        transform.translation.x = transform
-            .translation
-            .x
-            .clamp(-half_world_width + half_paddle_width, half_world_width - half_paddle_width);
+        let min_x = -half_world_width + half_paddle_width;
+        let max_x = half_world_width - half_paddle_width;
+        let prev_x = transform.translation.x;
+        let clamped_x = prev_x.clamp(min_x, max_x);
+        transform.translation.x = clamped_x;
+        // Reset velocity so player can move immediately in the other direction
+        if (clamped_x - prev_x).abs() > f32::EPSILON {
+            paddle.velocity = 0.0;
+        }
     }
 }
