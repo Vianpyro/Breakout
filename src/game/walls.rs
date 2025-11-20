@@ -6,7 +6,7 @@ const WALL_THICKNESS: f32 = 10.0;
 #[derive(Component)]
 pub struct Wall;
 
-pub fn create_walls(commands: &mut Commands, viewport: Res<crate::viewport::WindowViewport>) {
+pub fn create_walls(commands: &mut Commands, viewport: &Res<crate::viewport::WindowViewport>) {
     let half_width = viewport.half_width;
     let half_height = viewport.half_height;
 

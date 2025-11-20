@@ -61,6 +61,60 @@ fn spawn_camera(mut commands: Commands) {
 fn spawn_map(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>, viewport: Res<WindowViewport>) {
     game::paddle::create_paddle(&mut commands, &mut meshes, &mut materials);
     game::ball::create_ball(&mut commands, &mut meshes, &mut materials);
-    game::walls::create_walls(&mut commands, viewport);
-    game::brick::create_brick(&mut commands, &mut meshes, &mut materials, Vec2::new(0.0, 0.0), Vec2::ZERO, 3);
+    game::walls::create_walls(&mut commands, &viewport);
+
+    for i in 0..(crate::game::brick::DEFAULT_BRICK_SIZE.y as i32 + 5) {
+        let height = viewport.half_height - (i as f32 * (crate::game::brick::DEFAULT_BRICK_SIZE.y + 5.0));
+        spawn_brick_row(&mut commands, &mut *meshes, &mut *materials, &viewport, height);
+    }
+}
+
+fn spawn_brick_row(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<ColorMaterial>, viewport: &Res<WindowViewport>, height: f32) {
+    let brick_size = game::brick::DEFAULT_BRICK_SIZE;
+    let hit_points = 3;
+    let spacing = 5.0;
+
+    let half_brick = brick_size.x / 2.0;
+    let left_limit = -viewport.half_width + half_brick;
+    let right_limit = viewport.half_width - half_brick;
+
+    // If the brick is wider than the available space, place a single center brick.
+    if left_limit > right_limit {
+        let position = Vec2::new(0.0, 0.0);
+        game::brick::create_brick(commands, meshes, materials, position, brick_size, hit_points);
+        return;
+    }
+
+    let mut x_positions: Vec<f32> = Vec::new();
+    x_positions.push(0.0);
+
+    let mut k = 1;
+    loop {
+        let offset = k as f32 * (brick_size.x + spacing);
+        let right_x = offset;
+        let left_x = -offset;
+
+        let mut added = false;
+
+        if right_x <= right_limit {
+            x_positions.push(right_x);
+            added = true;
+        }
+
+        if left_x >= left_limit {
+            x_positions.push(left_x);
+            added = true;
+        }
+
+        if !added {
+            break;
+        }
+
+        k += 1;
+    }
+
+    for x in x_positions.iter() {
+        let position = Vec2::new(*x, height);
+        game::brick::create_brick(commands, meshes, materials, position, brick_size, hit_points);
+    }
 }

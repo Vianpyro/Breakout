@@ -2,7 +2,7 @@ use crate::viewport::{DEFAULT_VIRTUAL_HEIGHT, DEFAULT_VIRTUAL_WIDTH};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-const DEFAULT_BRICK_SIZE: Vec2 = Vec2::new(DEFAULT_VIRTUAL_WIDTH / 20.0, DEFAULT_VIRTUAL_HEIGHT / 40.0);
+pub const DEFAULT_BRICK_SIZE: Vec2 = Vec2::new(DEFAULT_VIRTUAL_WIDTH / 30.0, DEFAULT_VIRTUAL_HEIGHT / 40.0);
 
 #[derive(Component)]
 pub struct Brick {
